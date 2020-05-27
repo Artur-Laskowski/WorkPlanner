@@ -23,7 +23,7 @@ jobs:
       displayName: 'Test'
       inputs:
         command: test
-        arguments: '--no-build --collect:"XPlat Code Coverage" /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/Coverage/'
+        arguments: '--configuration $(buildConfiguration) --no-build --collect:"XPlat Code Coverage" /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/Coverage/'
         publishTestResults: true
 
     - task: PublishCodeCoverageResults@1
@@ -37,7 +37,7 @@ jobs:
       inputs:
         command: publish
         publishWebProjects: True
-        arguments: '--no-build --output $(Build.ArtifactStagingDirectory)'
+        arguments: '--configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)'
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish artifacts'
