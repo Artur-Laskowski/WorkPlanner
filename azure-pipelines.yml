@@ -34,7 +34,7 @@ jobs:
     - task: DotNetCoreCLI@2
       displayName: 'Publish test results'
       inputs:
-        command: publishTestResults
+        command: publish
         publishWebProjects: True
         arguments: '--output $(Build.ArtifactStagingDirectory)'
 
