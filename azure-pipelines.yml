@@ -1,0 +1,39 @@
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+
+jobs:
+  - job: build
+    steps:
+    - task: UseDotNet@2
+      inputs:
+        version: '5.0.x'
+        includePreviewVersions: true
+
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'build'
+
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: test
+        arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/Coverage/'
+        publishTestResults: true
+
+    - task: PublishCodeCoverageResults@1
+      inputs:
+        codeCoverageTool: 'Cobertura'
+        summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
+
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: publishTestResults
+        publishWebProjects: True
+        arguments: '--output $(Build.ArtifactStagingDirectory)'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathToPublish: '$(Build.ArtifactStagingDirectory)'
+        artifactName: 'WorkPlanner'
