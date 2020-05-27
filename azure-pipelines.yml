@@ -23,7 +23,7 @@ jobs:
       displayName: 'Test'
       inputs:
         command: test
-        arguments: '--configuration $(buildConfiguration) --no-build --collect:"XPlat Code Coverage" /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/Coverage/'
+        arguments: '--configuration $(buildConfiguration) --no-build --collect:"XPlat Code Coverage" -r:$(Build.SourcesDirectory)/TestResults/Coverage/'
         publishTestResults: true
 
     - task: PublishCodeCoverageResults@1
