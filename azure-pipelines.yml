@@ -3,44 +3,108 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
+  dockerRegistryServiceConnection: '8a5f7ee5-d382-44a1-90fc-42f5eeb90f29'
+  imageRepository: 'workplanner'
+  containerRegistry: 'webappsregistryal.azurecr.io'
+  dockerfilePath: '**/Dockerfile'
+  tag: '$(Build.BuildId)'
+  imagePullSecret: 'webappsregistryal2090a0db-auth'
 
-jobs:
-  - job: build
+stages:
+- stage: Build
+  displayName: Build stage
+  jobs:
+    - job: build
+      steps:
+      - task: UseDotNet@2
+        displayName: 'Download SDK 5.0'
+        inputs:
+          version: '5.0.x'
+          includePreviewVersions: true
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Build'
+        inputs:
+          command: 'build'
+          arguments: '--configuration $(buildConfiguration)'
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Test'
+        inputs:
+          command: test
+          arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/Coverage/'
+          publishTestResults: true
+
+      - task: PublishCodeCoverageResults@1
+        displayName: 'Publish code coverage'
+        inputs:
+          codeCoverageTool: 'Cobertura'
+          summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Publish'
+        inputs:
+          command: publish
+          publishWebProjects: True
+          arguments: '--configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)'
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish artifacts'
+        inputs:
+          pathToPublish: '$(Build.ArtifactStagingDirectory)'
+          artifactName: 'WorkPlanner'
+
+- stage: Build image
+  displayName: Build image stage
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImageName)
     steps:
-    - task: UseDotNet@2
-      displayName: 'Download SDK 5.0'
+    - task: Docker@2
+      displayName: Build and push an image to container registry
       inputs:
-        version: '5.0.x'
-        includePreviewVersions: true
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+          
+    - upload: manifests
+      artifact: manifests
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Build'
-      inputs:
-        command: 'build'
-        arguments: '--configuration $(buildConfiguration)'
+- stage: Deploy
+  displayName: Deploy stage
+  dependsOn: Build
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Test'
-      inputs:
-        command: test
-        arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/Coverage/'
-        publishTestResults: true
-
-    - task: PublishCodeCoverageResults@1
-      displayName: 'Publish code coverage'
-      inputs:
-        codeCoverageTool: 'Cobertura'
-        summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
-
-    - task: DotNetCoreCLI@2
-      displayName: 'Publish'
-      inputs:
-        command: publish
-        publishWebProjects: True
-        arguments: '--configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)'
-
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish artifacts'
-      inputs:
-        pathToPublish: '$(Build.ArtifactStagingDirectory)'
-        artifactName: 'WorkPlanner'
+  jobs:
+  - deployment: Deploy
+    displayName: Deploy
+    pool:
+      vmImage: $(vmImageName)
+    environment: 'ArturLaskowskiWorkPlanner-2083.workplanner'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: KubernetesManifest@0
+            displayName: Create imagePullSecret
+            inputs:
+              action: createSecret
+              secretName: $(imagePullSecret)
+              dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
+              
+          - task: KubernetesManifest@0
+            displayName: Deploy to Kubernetes cluster
+            inputs:
+              action: deploy
+              manifests: |
+                $(Pipeline.Workspace)/manifests/deployment.yml
+                $(Pipeline.Workspace)/manifests/service.yml
+              imagePullSecrets: |
+                $(imagePullSecret)
+              containers: |
+                $(containerRegistry)/$(imageRepository):$(tag)
