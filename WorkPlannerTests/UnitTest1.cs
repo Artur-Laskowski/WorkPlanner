@@ -1,5 +1,6 @@
 using System;
 using Xunit;
+using WorkPlanner.Controllers;
 
 namespace WorkPlannerTests
 {
@@ -8,7 +9,9 @@ namespace WorkPlannerTests
         [Fact]
         public void Test1()
         {
+            var controller = new HomeController(null);
 
+            Assert.NotNull(controller);
         }
     }
 }
