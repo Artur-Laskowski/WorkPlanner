@@ -7,7 +7,6 @@ variables:
   imageRepository: 'workplanner'
   containerRegistry: 'webappsregistryal.azurecr.io'
   dockerfilePath: '**/Dockerfile'
-  tag: '$(Build.BuildId)'
   imagePullSecret: 'webappsregistryal2090a0db-auth'
 
 stages:
@@ -22,11 +21,19 @@ stages:
           version: '5.0.x'
           includePreviewVersions: true
 
+      - task: UseGitVersion@5
+        displayName: gitversion
+        inputs:
+          versionSpec: '5.x'
+          updateAssemblyInfo: true
+
       - task: DotNetCoreCLI@2
         displayName: 'Build'
         inputs:
           command: 'build'
           arguments: '--configuration $(buildConfiguration)'
+          versioningScheme: byEnvVar
+          versionEnvVar: 'GitVersion.SemVer'
 
       - task: DotNetCoreCLI@2
         displayName: 'Test'
@@ -71,7 +78,7 @@ stages:
         dockerfile: $(dockerfilePath)
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
-          $(tag)
+          $(Build.BuildNumber)
           
     - upload: manifests
       artifact: manifests
@@ -107,4 +114,4 @@ stages:
               imagePullSecrets: |
                 $(imagePullSecret)
               containers: |
-                $(containerRegistry)/$(imageRepository):$(tag)
+                $(containerRegistry)/$(imageRepository):$(Build.BuildNumber)
