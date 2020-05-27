@@ -54,7 +54,7 @@ stages:
           pathToPublish: '$(Build.ArtifactStagingDirectory)'
           artifactName: 'WorkPlanner'
 
-- stage: Build image
+- stage: Build_image
   displayName: Build image stage
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   jobs:
