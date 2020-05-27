@@ -17,12 +17,13 @@ jobs:
       displayName: 'Build'
       inputs:
         command: 'build'
+        arguments: '--configuration $(buildConfiguration)'
 
     - task: DotNetCoreCLI@2
       displayName: 'Test'
       inputs:
         command: test
-        arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/Coverage/'
+        arguments: '--no-build --collect:"XPlat Code Coverage" /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/Coverage/'
         publishTestResults: true
 
     - task: PublishCodeCoverageResults@1
@@ -32,11 +33,11 @@ jobs:
         summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
 
     - task: DotNetCoreCLI@2
-      displayName: 'Publish test results'
+      displayName: 'Publish'
       inputs:
         command: publish
         publishWebProjects: True
-        arguments: '--output $(Build.ArtifactStagingDirectory)'
+        arguments: '--no-build --output $(Build.ArtifactStagingDirectory)'
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish artifacts'
