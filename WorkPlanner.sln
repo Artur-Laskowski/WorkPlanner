@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkPlanner", "workplanner\WorkPlanner.csproj", "{7662DFDB-E522-4C46-BB1F-1846CABBBB7A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkPlanner", "WorkPlanner\WorkPlanner.csproj", "{7662DFDB-E522-4C46-BB1F-1846CABBBB7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkPlannerTests", "workplannertests\WorkPlannerTests.csproj", "{86BF6215-7F98-48DA-B810-FB68FDF1ABC1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkPlannerTests", "WorkPlannerTests\WorkPlannerTests.csproj", "{86BF6215-7F98-48DA-B810-FB68FDF1ABC1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

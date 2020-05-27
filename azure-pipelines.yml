@@ -8,32 +8,38 @@ jobs:
   - job: build
     steps:
     - task: UseDotNet@2
+      displayName: 'Download SDK 5.0'
       inputs:
         version: '5.0.x'
         includePreviewVersions: true
 
     - task: DotNetCoreCLI@2
+      displayName: 'Build'
       inputs:
         command: 'build'
 
     - task: DotNetCoreCLI@2
+      displayName: 'Test'
       inputs:
         command: test
         arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/Coverage/'
         publishTestResults: true
 
     - task: PublishCodeCoverageResults@1
+      displayName: 'Publish code coverage'
       inputs:
         codeCoverageTool: 'Cobertura'
         summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
 
     - task: DotNetCoreCLI@2
+      displayName: 'Publish test results'
       inputs:
         command: publishTestResults
         publishWebProjects: True
         arguments: '--output $(Build.ArtifactStagingDirectory)'
 
     - task: PublishBuildArtifacts@1
+      displayName: 'Publish artifacts'
       inputs:
         pathToPublish: '$(Build.ArtifactStagingDirectory)'
         artifactName: 'WorkPlanner'
