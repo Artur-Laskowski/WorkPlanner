@@ -9,7 +9,7 @@ namespace WorkPlannerTests
         [Fact]
         public void Test1()
         {
-            var controller = new HomeController(null);
+            var controller = new ValuesController();
 
             Assert.NotNull(controller);
         }
