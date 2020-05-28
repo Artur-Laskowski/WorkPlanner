@@ -138,5 +138,5 @@ stages:
               imagePullSecrets: |
                 $(imagePullSecret)
               containers: |
+                $(containerRegistry)/workplannerapp:$(Build.BuildNumber)
                 $(containerRegistry)/workplanner:$(Build.BuildNumber)
-                $(containerRegistry)/workplannerapi:$(Build.BuildNumber)
