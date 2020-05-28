@@ -110,7 +110,9 @@ stages:
 
 - stage: Deploy
   displayName: Deploy stage
-  dependsOn: Build_image
+  dependsOn:
+    - Build_image_app
+    - Build_image_api
 
   jobs:
   - deployment: Deploy
