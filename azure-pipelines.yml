@@ -84,6 +84,12 @@ stages:
         tags: |
           $(Build.BuildNumber)
 
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish artifacts'
+      inputs:
+        pathToPublish: '$(Build.ArtifactStagingDirectory)'
+        artifactName: 'WorkPlanner'
+
 - stage: Deploy
   displayName: Deploy stage
   dependsOn: Build_image
