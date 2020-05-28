@@ -86,7 +86,7 @@ stages:
 
     - task: PublishPipelineArtifact@1
       inputs:
-        targetPath: '$(Pipeline.Workspace)'
+        targetPath: '$(Build.SourcesDirectory)/manifests'
         artifactName: 'manifests'
 
 - stage: Deploy
@@ -113,8 +113,8 @@ stages:
             inputs:
               action: deploy
               manifests: |
-                $(Pipeline.Workspace)/manifests/s/manifests/deployment.yml
-                $(Pipeline.Workspace)/manifests/s/manifests/service.yml
+                $(Pipeline.Workspace)/manifests/deployment.yml
+                $(Pipeline.Workspace)/manifests/service.yml
               imagePullSecrets: |
                 $(imagePullSecret)
               containers: |
