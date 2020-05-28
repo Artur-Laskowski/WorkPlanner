@@ -12,6 +12,6 @@ FROM mcr.microsoft.com/dotnet/nightly/aspnet:5.0-alpine AS runtime
 WORKDIR /app
 COPY --from=build /app/out ./
 
-ENV ASPNETCORE_URLS http://*:8080
+ENV ASPNETCORE_URLS http://*:80
 
-ENTRYPOINT ["dotnet", "WorkPlanner.dll", "--port", "80"]
+ENTRYPOINT ["dotnet", "WorkPlanner.dll"]
