@@ -28,7 +28,7 @@ stages:
       - task: gitversion/execute@0
         inputs:
           useConfigFile: true
-          configFilePath: 'gitVersion.yml'
+          configFilePath: '$(Build.SourcesDirectory)/gitVersion.yml'
           updateAssemblyInfo: true
 
       - task: DotNetCoreCLI@2
