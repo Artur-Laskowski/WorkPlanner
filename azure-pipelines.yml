@@ -21,11 +21,18 @@ stages:
           version: '5.0.x'
           includePreviewVersions: true
 
-      - task: UseGitVersion@5
-        displayName: gitversion
+      - task: UseDotNet@2
+        displayName: 'Download SDK 3.1'
+        inputs:
+          version: '3.1.x'
+
+      - task: gitversion/setup@0
+        displayName: 'Setup GitVersion'
         inputs:
           versionSpec: '5.x'
-          updateAssemblyInfo: true
+          includePrerelease: true
+      - task: gitversion/execute@0
+        displayName: 'Execute GitVersion'
 
       - task: DotNetCoreCLI@2
         displayName: 'Build'
@@ -63,12 +70,9 @@ stages:
 
 - stage: Build_image
   displayName: Build image stage
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   jobs:
   - job: Build
     displayName: Build
-    pool:
-      vmImage: $(vmImageName)
     steps:
     - task: Docker@2
       displayName: Build and push an image to container registry
@@ -90,8 +94,6 @@ stages:
   jobs:
   - deployment: Deploy
     displayName: Deploy
-    pool:
-      vmImage: $(vmImageName)
     environment: 'ArturLaskowskiWorkPlanner-2083.workplanner'
     strategy:
       runOnce:
