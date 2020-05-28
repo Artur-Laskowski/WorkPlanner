@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: workplannerapp
+    spec:
+      containers:
+      - name: workplannerapp
+        image: webappsregistryal.azurecr.io/workplannerapp
+        ports:
+        - containerPort: 80
