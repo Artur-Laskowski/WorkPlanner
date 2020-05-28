@@ -86,7 +86,7 @@ stages:
 
     - task: PublishPipelineArtifact@1
       inputs:
-        targetPath: '$(Pipeline.Workspace)'
+        targetPath: '$(Build.SourcesDirectory)/manifests'
         artifactName: 'manifests'
 
 - stage: Deploy
@@ -96,7 +96,7 @@ stages:
   jobs:
   - deployment: Deploy
     displayName: Deploy
-    environment: 'ArturLaskowskiWorkPlanner-2083.workplanner'
+    environment: 'ArturLaskowskiWorkPlanner.workplanner'
     strategy:
       runOnce:
         deploy:
