@@ -66,11 +66,12 @@ stages:
           pathToPublish: '$(Build.ArtifactStagingDirectory)'
           artifactName: 'WorkPlanner'
 
-- stage: Build_image_api
-  displayName: Build API image stage
+- stage: Build_images
+  displayName: Build images stage
+  dependsOn: Build
   jobs:
-  - job: Build
-    displayName: Build
+  - job: Build_image_api
+    displayName: Build API image
     steps:
     - task: Docker@2
       displayName: Build and push an image to container registry
@@ -87,11 +88,8 @@ stages:
         targetPath: '$(Build.SourcesDirectory)/Kubernetes'
         artifactName: 'manifests'
 
-- stage: Build_image_app
-  displayName: Build App image stage
-  jobs:
-  - job: Build
-    displayName: Build
+  - job: Build_image_app
+    displayName: Build App image
     steps:
     - task: Docker@2
       displayName: Build and push an image to container registry
@@ -110,9 +108,7 @@ stages:
 
 - stage: Deploy
   displayName: Deploy stage
-  dependsOn:
-    - Build_image_app
-    - Build_image_api
+  dependsOn: Build_images
 
   jobs:
   - deployment: Deploy
@@ -134,11 +130,11 @@ stages:
             inputs:
               action: deploy
               manifests: |
-                $(Pipeline.Workspace)/Kubernetes/api-deployment.yml
-                $(Pipeline.Workspace)/Kubernetes/api-service.yml
-                $(Pipeline.Workspace)/Kubernetes/app-deployment.yml
-                $(Pipeline.Workspace)/Kubernetes/app-service.yml
-                $(Pipeline.Workspace)/Kubernetes/kubernetes-ingress.yml
+                $(Pipeline.Workspace)/manifests/api-deployment.yml
+                $(Pipeline.Workspace)/manifests/api-service.yml
+                $(Pipeline.Workspace)/manifests/app-deployment.yml
+                $(Pipeline.Workspace)/manifests/app-service.yml
+                $(Pipeline.Workspace)/manifests/kubernetes-ingress.yml
               imagePullSecrets: |
                 $(imagePullSecret)
               containers: |
