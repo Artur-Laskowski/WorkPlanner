@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/dotnet/nightly/sdk:5.0-alpine AS build
 WORKDIR /app
-COPY WorkPlanner/*.csproj ./
+COPY *.csproj ./
 RUN dotnet restore
 
 COPY . ./

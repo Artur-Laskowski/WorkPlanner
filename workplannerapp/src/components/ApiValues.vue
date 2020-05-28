@@ -23,7 +23,9 @@ export default {
     this.exception = '';
     try {
       const response = await fetch('/api/values');
-      let data = await response.json();
+      const answer = await response.text();
+      console.log(answer);
+      let data = JSON.parse(answer);
       this.values = data;
     } catch (err) {
       console.log('error', err);

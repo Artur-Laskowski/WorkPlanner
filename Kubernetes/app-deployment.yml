@@ -4,6 +4,9 @@ metadata:
   name: app-deployment
 spec:
   replicas: 2
+  selector:
+    matchLabels:
+      app: workplannerapp
   template:
     metadata:
       labels:
