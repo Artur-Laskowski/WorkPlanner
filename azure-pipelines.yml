@@ -84,11 +84,6 @@ stages:
         tags: |
           $(Build.BuildNumber)
 
-    - task: PublishPipelineArtifact@1
-      inputs:
-        targetPath: '$(Pipeline.Workspace)'
-        artifactName: 'manifests'
-
 - stage: Deploy
   displayName: Deploy stage
   dependsOn: Build_image
@@ -113,8 +108,8 @@ stages:
             inputs:
               action: deploy
               manifests: |
-                $(Pipeline.Workspace)/manifests/deployment.yml
-                $(Pipeline.Workspace)/manifests/service.yml
+                $(Build.SourcesDirectory)/manifests/deployment.yml
+                $(Build.SourcesDirectory)/manifests/service.yml
               imagePullSecrets: |
                 $(imagePullSecret)
               containers: |
