@@ -18,8 +18,3 @@ spec:
         backend:
           serviceName: app-service
           servicePort: 80
-controller:
-  service:
-    loadBalancerIP: 10.240.0.42
-    annotations:
-      service.beta.kubernetes.io/azure-load-balancer-internal: "true"
