@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 apiVersion: v1
 kind: Service
 metadata:
@@ -8,15 +7,4 @@ spec:
     ports:
     - port: 80
     selector:
-=======
-apiVersion: v1
-kind: Service
-metadata:
-    name: workplanner
-spec:
-    type: LoadBalancer
-    ports:
-    - port: 5741 
-    selector:
->>>>>>> master
         app: workplanner
