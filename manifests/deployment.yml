@@ -13,4 +13,4 @@ spec:
         - name: workplanner 
           image: webappsregistryal.azurecr.io/workplanner
           ports:
-          - containerPort: 5741
+          - containerPort: 80
