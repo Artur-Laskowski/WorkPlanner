@@ -14,4 +14,4 @@ COPY --from=build /app/out ./
 
 ENV ASPNETCORE_URLS http://*:8080
 
-ENTRYPOINT ["dotnet", "WorkPlanner.dll" "--port", "80"]
+ENTRYPOINT ["dotnet", "WorkPlanner.dll", "--port", "80"]
