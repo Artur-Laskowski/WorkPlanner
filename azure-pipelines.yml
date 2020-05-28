@@ -4,9 +4,7 @@ pool:
 variables:
   buildConfiguration: 'Release'
   dockerRegistryServiceConnection: '8a5f7ee5-d382-44a1-90fc-42f5eeb90f29'
-  imageRepository: 'workplanner'
   containerRegistry: 'webappsregistryal.azurecr.io'
-  dockerfilePath: '**/Dockerfile'
   imagePullSecret: 'webappsregistryal2090a0db-auth'
 
 stages:
@@ -68,9 +66,8 @@ stages:
           pathToPublish: '$(Build.ArtifactStagingDirectory)'
           artifactName: 'WorkPlanner'
 
-- stage: Build_image
-  displayName: Build image stage
-  #condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+- stage: Build_image_api
+  displayName: Build API image stage
   jobs:
   - job: Build
     displayName: Build
@@ -79,15 +76,36 @@ stages:
       displayName: Build and push an image to container registry
       inputs:
         command: buildAndPush
-        repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
+        repository: workplannerapi
+        dockerfile: ./WorkPlanner/Dockerfile
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(Build.BuildNumber)
 
     - task: PublishPipelineArtifact@1
       inputs:
-        targetPath: '$(Build.SourcesDirectory)/manifests'
+        targetPath: '$(Build.SourcesDirectory)/Kubernetes'
+        artifactName: 'manifests'
+
+- stage: Build_image_app
+  displayName: Build App image stage
+  jobs:
+  - job: Build
+    displayName: Build
+    steps:
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        repository: workplannerapp
+        dockerfile: ./workplannerapp/Dockerfile
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(Build.BuildNumber)
+
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(Build.SourcesDirectory)/Kubernetes'
         artifactName: 'manifests'
 
 - stage: Deploy
@@ -114,9 +132,13 @@ stages:
             inputs:
               action: deploy
               manifests: |
-                $(Pipeline.Workspace)/manifests/deployment.yml
-                $(Pipeline.Workspace)/manifests/service.yml
+                $(Pipeline.Workspace)/Kubernetes/api-deployment.yml
+                $(Pipeline.Workspace)/Kubernetes/api-service.yml
+                $(Pipeline.Workspace)/Kubernetes/app-deployment.yml
+                $(Pipeline.Workspace)/Kubernetes/app-service.yml
+                $(Pipeline.Workspace)/Kubernetes/kubernetes-ingress.yml
               imagePullSecrets: |
                 $(imagePullSecret)
               containers: |
-                $(containerRegistry)/$(imageRepository):$(Build.BuildNumber)
+                $(containerRegistry)/workplannerapp:$(Build.BuildNumber)
+                $(containerRegistry)/workplannerapi:$(Build.BuildNumber)
