@@ -26,10 +26,6 @@ stages:
           versionSpec: '5.x'
           includePrerelease: true
       - task: gitversion/execute@0
-        inputs:
-          useConfigFile: true
-          configFilePath: '$(Build.SourcesDirectory)/GitVersion.yml'
-          updateAssemblyInfo: true
 
       - task: DotNetCoreCLI@2
         displayName: 'Build'
