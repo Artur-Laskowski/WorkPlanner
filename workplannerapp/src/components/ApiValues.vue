@@ -3,7 +3,7 @@
     <h1>API Values</h1>
     <p>
       Hello from
-      <span v-for="val in values" :key="val">
+      <span v-for="val in values" :key="val" class="values">
         {{ val }}
       </span>
     </p>

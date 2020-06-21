@@ -1,0 +1,10 @@
+version: '3'
+services:
+    app:
+        build: ./workplannerapp
+        ports:
+            - "80:80"
+    api:
+        build: ./WorkPlanner
+        ports:
+            - "5000:5000"
